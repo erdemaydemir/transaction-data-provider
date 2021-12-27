@@ -10,28 +10,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Tag(name = "Transaction Data Provider", description = "Transaction data for addresses")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/txs")
 public class TxApi {
 
-    private static final List<String> ADDRESSES = new ArrayList<>();
-
-    static {
-        ADDRESSES.add("0x27066d336c9f25c2477cc5a319ab37ba5f5ca508");
-        ADDRESSES.add("0xa7728a59522af8ebc762b20e682d0cc4b1a36e1f");
-    }
-
     private final TxService txService;
-
-    @GetMapping("/searchable-addresses")
-    public ResponseEntity<List<String>> getSearchableAddresses() {
-        return ResponseEntity.ok(ADDRESSES);
-    }
 
     @GetMapping
     public ResponseEntity<Page<Tx>> findAllByCustomFilter(@ModelAttribute TxFilter txFilter,
@@ -54,21 +39,16 @@ public class TxApi {
 
     @PutMapping("/addresses/{address}")
     public ResponseEntity<Void> saveTxsOfAddress(@PathVariable("address") String address) {
-        if (!ADDRESSES.contains(address)) {
-            ADDRESSES.add(address);
-            try {
-                txService.saveTxsOfAddress(address);
-            } catch (Exception ex) {
-                ADDRESSES.remove(address);
-                return ResponseEntity.internalServerError().build();
-            }
+        try {
+            txService.saveTxsOfAddress(address);
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().build();
         }
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/addresses/{address}")
     public ResponseEntity<Void> deleteTxsOfAddress(@PathVariable("address") String address) {
-        ADDRESSES.remove(address);
         txService.deleteByAddress(address);
         return ResponseEntity.ok().build();
     }
