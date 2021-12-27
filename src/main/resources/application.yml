@@ -1,0 +1,43 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: ethereum-transaction-data-provider
+  jmx:
+    enabled: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+logging:
+  pattern:
+    file: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){blue} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx'
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){blue} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx'
+server:
+  port: 8080
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  elasticsearch:
+    uris:
+      [ 'http://localhost:9200' ]
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+      moralis:
+        connectTimeout: 150000
+        readTimeout: 150000
+        apiUrl: 'https://deep-index.moralis.io/api/v2'
+        apiKey: iuk9SW1wUMyfPTQGt1IS4bTiJ08963KUFUj1d9j7xm3a8LbSjFOv5dJhYFqM5MuA
